@@ -23,6 +23,8 @@ Route::prefix('auth')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
     Route::post('/login', [AuthController::class, 'login']);
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth');
+    Route::post('/update-password', [AuthController::class, 'updatePassword'])->middleware('auth');
 });
 
 Route::get('/get-profile', [AuthController::class, 'profile'])->middleware('auth');
+Route::post('/update-profile', [AuthController::class, 'updateProfile'])->middleware('auth');
