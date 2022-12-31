@@ -10,6 +10,8 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use App\Traits\UseUuid;
 use App\Models\Role;
+use App\Models\OtpCode;
+use Carbon\Carbon;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -73,15 +75,37 @@ class User extends Authenticatable implements JWTSubject
         return $this->belongsTo(Role::class, 'role_id');
     }
 
+    public function otpCode(){
+        return $this->hasOne(OtpCode::class, 'role_id');
+    }
+
     public function get_role_user(){
         $role = Role::where('name', 'user')->first();
         return $role->id;
+    }
+
+    public function generate_otp_code(){
+        do{
+            $randomNumber = mt_rand(100000, 999999);
+            $check = OtpCode::where('otp', $randomNumber)->first();
+        } while($check);
+
+        $now = Carbon::now();
+
+        $otp_code = OtpCode::updateOrCreate(
+            ['user_id' => $this->id],
+            ['otp' => $randomNumber, 'valid_until' => $now->addMinutes(5)]
+        );
     }
 
     public static function boot(){
         parent::boot();
         static::creating(function($model){
             $model->role_id = $model->get_role_user();
+        });
+
+        static::created(function($model){
+            $model->generate_otp_code();
         });
     }
 }

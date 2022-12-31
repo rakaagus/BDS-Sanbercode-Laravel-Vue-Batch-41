@@ -6,6 +6,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\OtpCode;
+use Illuminate\Support\Str;
+use Carbon\Carbon;
 
 class AuthController extends Controller
 {
@@ -71,7 +74,6 @@ class AuthController extends Controller
     }
 
     public function updatePassword(Request $request){
-        $data['user'] = Auth()->user();
 
         $validated = $request->validate([
             "email" => "required",
@@ -89,20 +91,19 @@ class AuthController extends Controller
     }
 
     public function updateProfile(Request $request){
-        $data['user'] = Auth()->user();
+        $user = auth()->user();
 
         $validated = $request->validate([
             "name" => "required",
             "photo_profile" => "mimes:png,jpg,jpeg",
         ]);
 
-        $user = User::where('name', $request->name)->first();
         $user->name = $request->name;
 
         if($request->hasFile('photo_profile')){
             $photo = $request->file('photo_profile');
             $photo_extension = $photo->getClientOriginalExtension();
-            $photo_name = time().'.'.$photo_extension;
+            $photo_name = Str::slug($user->name, '-').'-'.$user->id.'.'.$photo_extension;
 
             $photo_folder = '/photos/profile/';
             $photo_location = $photo_folder.$photo_name;
@@ -119,10 +120,65 @@ class AuthController extends Controller
         }
 
         $user->save();
+
         return response()->json([
             "response_code" => "00",
             "response_message" => "Profile berhasil diupdate",
         ], 200);
 
+    }
+
+    public function generatorOTP(Request $request){
+        $validated = $request->validate([
+            "email" => "required|email",
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        $user->generate_otp_code();
+
+        $data['user'] = $user;
+
+        return response()->json([
+            "success" => true,
+            "message" =>  "OTP Code Berhasil di generate",
+            "data" => $data,
+        ], 200);
+    }
+
+    public function verifikasi(Request $request){
+        $validated = $request->validate([
+            "otp" => "required",
+        ]);
+
+        $otp_code = OtpCode::where('otp', $request->otp)->first();
+
+        if(!$otp_code){
+            return response()->json([
+                "response_code" => "01",
+                "response_message" =>  "OTP Code tidak ditemukan"
+            ], 400);
+        }
+
+        $now = Carbon::now();
+        if($now > $otp_code->valid_until){
+            return response()->json([
+                "response_code" => "01",
+                "response_message" =>  "otp code sudah tidak berlaku, silahkan generate ulang"
+            ], 400);
+        }
+
+        //update user ketika otp yang dimasukan benar
+        $user = User::find($otp_code->user_id);
+        $user->email_verified_at = Carbon::now();
+        $user->save();
+
+        //delete otp
+        $otp_code->delete();
+
+        return response()->json([
+            "response_code" => "01",
+            "response_message" =>  "email sudah terverifikasi"
+        ], 200);
     }
 }
