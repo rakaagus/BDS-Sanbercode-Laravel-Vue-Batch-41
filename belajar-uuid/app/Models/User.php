@@ -76,12 +76,20 @@ class User extends Authenticatable implements JWTSubject
     }
 
     public function otpCode(){
-        return $this->hasOne(OtpCode::class, 'role_id');
+        return $this->hasOne(OtpCode::class);
     }
 
     public function get_role_user(){
         $role = Role::where('name', 'user')->first();
         return $role->id;
+    }
+
+    public function isAdmin(){
+        if($this->role){
+            if($this->role->name == 'admin'){
+                return true;
+            }
+        }
     }
 
     public function generate_otp_code(){

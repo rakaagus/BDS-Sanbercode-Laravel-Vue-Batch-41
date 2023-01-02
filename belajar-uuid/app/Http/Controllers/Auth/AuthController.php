@@ -9,6 +9,9 @@ use App\Models\User;
 use App\Models\OtpCode;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
+use Mail;
+use App\Mail\UserRegisterMail;
+use App\Mail\GenerateOtp;
 
 class AuthController extends Controller
 {
@@ -28,6 +31,9 @@ class AuthController extends Controller
         ]);
 
         $data['user'] = $user;
+
+        //testing
+        Mail::to($user->email)->send(new UserRegisterMail($user));
 
         return response()->json([
             "response_code" => "201",
@@ -138,6 +144,9 @@ class AuthController extends Controller
         $user->generate_otp_code();
 
         $data['user'] = $user;
+
+        //testing
+        Mail::to($user->email)->send(new GenerateOtp($user));
 
         return response()->json([
             "success" => true,

@@ -30,3 +30,4 @@ Route::prefix('auth')->group(function () {
 
 Route::get('/get-profile', [AuthController::class, 'profile'])->middleware('auth', 'email_verified');
 Route::post('/update-profile', [AuthController::class, 'updateProfile'])->middleware('auth', 'email_verified');
+
