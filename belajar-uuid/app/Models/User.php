@@ -85,12 +85,20 @@ class User extends Authenticatable implements JWTSubject
     }
 
     public function isAdmin(){
-        if($this->role){
-            if($this->role->name == 'admin'){
-                return true;
-            }
+        $role = Role::where('name', 'admin')->first();
+        $idAdmin = $role->id;
+        if($idAdmin){
+            return true;
         }
     }
+
+    // public function isAdmin(){
+    //     if($this->role){
+    //         if($this->role->name == 'admin'){
+    //             return true;
+    //         }
+    //     }
+    // }
 
     public function generate_otp_code(){
         do{
