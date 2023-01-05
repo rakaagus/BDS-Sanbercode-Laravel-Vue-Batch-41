@@ -67,12 +67,11 @@ console.log("================== Soal Nomor 5 ========================");
 buatlah function untuk menghitung berapa jumlah huruf vocal pada parameter string gunaka arrow function
 */
 const hitungVokal = (str) => {
-    const hasil = [...str];
+    const lowercase = str.toLowerCase();
+    const hasil = [...lowercase];
     let output = 0;
     hasil.forEach((item) => {
         if(item === "a" || item === "i" || item === "u" || item === "e" || item === "o"){
-            output++;
-        }else if(item === "A" || item === "I" || item === "U" || item === "E" || item === "O"){
             output++;
         }
     });
