@@ -133,7 +133,7 @@ class CampaignController extends Controller
     {
         //
         $request->validate([
-            'title' => 'required|unique:campaigns,title',
+            'title' => 'required',
             'description' => 'required',
             'address' => 'required',
             'image' => 'mimes:png,jpg,jpeg',

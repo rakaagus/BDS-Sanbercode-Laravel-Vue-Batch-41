@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>Tugas Ajax</title>
+</head>
+<body>
+    <div id="app" class="container">
+        <div class="row">
+            <!-- table -->
+            <div class="col">
+                <table class="table">
+                    <thead class="thead-dark">
+                      <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">img</th>
+                        <th scope="col">title</th>
+                        <th scope="col">description</th>
+                        <th scope="col">action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="campaign in campaigns">
+                        <th scope="row">1</th>
+                        <td>{{campaign.image}}</td>
+                        <td>{{campaign.title}}</td>
+                        <td>{{campaign.description}}</td>
+                        <td>
+                            <button @click="editCampaign(campaign)" class="btn btn-warning mr-2">Edit</button>
+                            <button @click="deleteDataCampaign(campaign.id)" class="btn btn-danger">delete</button>
+                            <button @click="editPhoto(campaign)" class="btn btn-primary mt-2 mr-2">update Photo</button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+            </div>
+            <!-- form -->
+            <div class="col">
+                <form @submit.prevent="submitCampaign">
+                    <p v-if="errors.length">
+                        <ul>
+                            <li v-for="error in errors">{{error}}</li>
+                        </ul>
+                    </p>
+                    <div class="form-group">
+                        <label for="titleCampaign">Title Campaign</label>
+                        <input type="text" :disabled="buttonStatus == 'upload'" class="form-control" id="titleCampaign" aria-describedby="emailHelp" placeholder="Enter title of Campaign" v-model="title">
+                        <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                      </div>
+                      <div class="form-group">
+                        <label for="requiredData">Required Money</label>
+                        <input type="number" class="form-control" id="requiredData" placeholder="money required" v-model="required" :disabled="buttonStatus == 'upload'">
+                      </div>
+                      <div class="form-group">
+                        <label for="colletionData">Colletion Money</label>
+                        <input type="number" class="form-control" id="colletionData" placeholder="collected funds" v-model="collected" :disabled="buttonStatus == 'upload'">
+                      </div>
+                      <div class="form-group">
+                        <label for="addresCampaign">Addres of Campaign</label>
+                        <textarea class="form-control" id="addresCampaign" rows="3" v-model="address" :disabled="buttonStatus == 'upload'"></textarea>
+                      </div>
+                      <div class="form-group">
+                        <label for="descriptionCampaign">description campaign</label>
+                        <textarea class="form-control" id="descriptionCampaign" rows="3" v-model="description" :disabled="buttonStatus == 'upload'"></textarea>
+                      </div>
+
+                      <div v-if="buttonStatus == 'submit'">
+                          <button type="submit" class="btn btn-primary">Submit</button>
+                      </div>
+                      <div v-else-if="buttonStatus == 'update'">
+                          <button type="submit" @click="updateDataCampaign(idCampaign)" class="btn btn-warning mr-2">update</button>
+                          <button type="submit" @click="clearForm()" class="btn btn-danger">reset</button>
+                      </div>
+                      <div v-else-if="buttonStatus == 'upload'">
+                        <input type="file" name="" id="" class="form-control mt-2 mb-2" name="image" ref="photo">
+                        <button type="submit" @click="updatePhotoCampaign(idUploadPhoto)" class="btn btn-primary mr-2">update</button>
+                        <button type="submit" @click="cancle()" class="btn btn-warning">cancle</button>
+                      </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+        const { createApp } = Vue
+
+        createApp({
+            data() {
+                return {
+                    title: "",
+                    description: "",
+                    collected: 0,
+                    required: 0,
+                    address: "",
+                    errors: [],
+                    domain: "http://127.0.0.1:8000/",
+                    campaigns: [],
+                    buttonStatus: "submit",
+                    idCampaign: null,
+                    idUploadPhoto: null,
+                }
+            },
+            methods: {
+                validationForm(){
+                    this.errors = []
+
+                    if(this.title.length < 5){
+                        this.errors.push("Nama Harus Lebih Dari 5 Karakter")
+                    }
+                    if(this.description.length == 0){
+                        this.errors.push("description Harus diisi")
+                    }
+                    if(this.collected == 0){
+                        this.errors.push("collected Harus lebih dari 0")
+                    }
+                    if(this.required == 0){
+                        this.errors.push("required Harus lebih dari 0")
+                    }
+                    if(this.address.length == 0){
+                        this.errors.push("address Harus diisi")
+                    }
+                },
+                cancle(){
+                    this.buttonStatus = 'submit'
+                },
+                editCampaign(campaign){
+                    this.title = campaign.title,
+                    this.description = campaign.description,
+                    this.address = campaign.address,
+                    this.required = campaign.required,
+                    this.collected = campaign.collected,
+                    this.idCampaign = campaign.id
+                    this.buttonStatus = 'update'
+                },
+                deleteDataCampaign(id){
+                    const config = {
+                        method: 'post',
+                        url: this.domain + `api/campaign/${id}`,
+                        params: { _method: 'DELETE' },
+                    }
+                    axios(config)
+                        .then((response) => {
+                            this.getDataCampaign()
+                            alert(response.data.response_message);
+                        })
+                        .catch((error) => {
+                            console.log(error);
+                        });
+                },
+                updateDataCampaign(id){
+                    this.validationForm()
+
+                    let formData = new FormData();
+                    formData.append('title', this.title)
+                    formData.append('description', this.description)
+                    formData.append('collected', this.collected)
+                    formData.append('required', this.required)
+                    formData.append('address', this.address)
+
+                    if(this.errors.length === 0){
+                        const config = {
+                            method: 'post',
+                            url: this.domain + `api/campaign/${id}`,
+                            params: { _method: 'PUT' },
+                            data: formData
+                        }
+                        axios(config)
+                            .then((response) => {
+                                this.clearForm()
+                                this.getDataCampaign()
+                                alert(response.data.response_message);
+                            })
+                            .catch((error) => {
+                                console.log(error);
+                            });
+                    }
+                },
+                updatePhotoCampaign(id){
+                    let file = this.$refs.photo.files[0]
+
+                    let formData = new FormData()
+                    formData.append('title', this.title)
+                    formData.append('description', this.description)
+                    formData.append('collected', this.collected)
+                    formData.append('required', this.required)
+                    formData.append('address', this.address)
+                    formData.append('image', file)
+
+                    const config = {
+                        method: 'post',
+                        url: this.domain + `api/campaign/${id}`,
+                        params: { _method: 'PUT' },
+                        data: formData
+                    }
+                    axios(config)
+                        .then((response) => {
+                            this.clearForm()
+                            this.getDataCampaign()
+                            alert(response.data.response_message);
+                        })
+                        .catch((error) => {
+                            console.log(error);
+                        });
+                },
+                editPhoto(campaign){
+                    this.title = campaign.title,
+                    this.description = campaign.description,
+                    this.address = campaign.address,
+                    this.required = campaign.required,
+                    this.collected = campaign.collected,
+                    this.idUploadPhoto = campaign.id
+                    this.buttonStatus = 'upload'
+                },
+                clearForm: function(){
+                    this.title = "",
+                    this.address = "",
+                    this.description = "",
+                    this.required = 0,
+                    this.collected = 0,
+                    this.buttonStatus = "submit",
+                    this.idCampaign = null
+                },
+                getDataCampaign(){
+                    const config = {
+                        method: 'get',
+                        url: this.domain + 'api/campaign',
+                    }
+                    axios(config)
+                        .then((response) => {
+                            console.log(response)
+                            this.campaigns = response.data.data.campaign
+                        })
+                        .catch((error) => {
+                            console.log(error);
+                        });
+                },
+                submitCampaign(){
+                    this.validationForm();
+
+                    let formData = new FormData();
+                    formData.append('title', this.title)
+                    formData.append('description', this.description)
+                    formData.append('collected', this.collected)
+                    formData.append('required', this.required)
+                    formData.append('address', this.address)
+
+                    if(this.errors.length === 0){
+                        const config = {
+                            method: 'post',
+                            url: this.domain + 'api/campaign',
+                            data: formData
+                        }
+                        axios(config)
+                            .then((response) => {
+                                this.clearForm()
+                                alert(response.data.response_message);
+                            })
+                            .catch((error) => {
+                                console.log(error);
+                            });
+                    }
+                },
+            },
+            created(){
+                this.getDataCampaign()
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html>
