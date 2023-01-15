@@ -13,12 +13,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-Route::get('/test', function () {
-    return view('emailregister');
-});
-Route::get('/test-otp', function () {
-    return view('generateotp');
-});
+Route::get('/{any}', function () {
+    return view('app');
+})->where('any', '.*');

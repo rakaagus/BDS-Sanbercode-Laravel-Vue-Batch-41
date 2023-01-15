@@ -60,7 +60,7 @@ class AuthController extends Controller
     }
 
     public function profile(){
-        $data['user'] = Auth()->user();
+        $data['user'] = Auth()->user()->load('role');
 
         return response()->json([
             "response_code" => "200",
