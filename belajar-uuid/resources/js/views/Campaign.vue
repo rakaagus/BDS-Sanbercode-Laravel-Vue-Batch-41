@@ -1,13 +1,18 @@
 <template>
-  <div class="container">
-    <div class="row justify-content-center">
-      <div class="col-md-8">
-        <div class="card">
-          <div class="card-header">Halaman Campaign</div>
+  <v-card class="mx-auto" width="800" prepend-icon="mdi-home">
+    <template v-slot:title> Campaign </template>
 
-          <div class="card-body">Ini Halaman Campaign</div>
-        </div>
-      </div>
-    </div>
-  </div>
+    <v-card-text class="mt-6">
+      <table-campaign />
+    </v-card-text>
+  </v-card>
 </template>
+
+<script>
+import TableCampaign from "../components/campaign/tableCampaign.vue";
+export default {
+  components: {
+    TableCampaign,
+  },
+};
+</script>
