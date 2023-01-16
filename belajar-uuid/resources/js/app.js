@@ -19,6 +19,7 @@ import * as directives from 'vuetify/directives'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedState from 'pinia-plugin-persistedstate'
 import { useUserStore } from './store/user';
+import { useCampaignStore } from './store/campaign';
 
 const vuetify = createVuetify({
     components,
@@ -43,6 +44,7 @@ app.use(pinia)
 
 
 const userState = useUserStore()
+const campaignStore = useCampaignStore()
 /**
  * The following block of code may be used to automatically register your
  * Vue components. It will recursively scan this directory for the Vue

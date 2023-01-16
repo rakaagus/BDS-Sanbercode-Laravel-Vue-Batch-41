@@ -16,8 +16,8 @@
           <v-btn color="blue-darken-1" variant="text" @click="dialog = false">
             Close
           </v-btn>
-          <v-btn color="blue-darken-1" variant="text" @click="dialog = false">
-            Save
+          <v-btn color="blue-darken-1" variant="text" @click="hapusData">
+            Comfirm
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -31,6 +31,21 @@ export default {
     return {
       dialog: false,
     };
+  },
+  props: ["campaignId"],
+  methods: {
+    async hapusData() {
+      try {
+        await axios.post(`/api/campaign/${this.campaignId}`, {
+          _method: "DELETE",
+        });
+
+        this.dialog = false;
+        await this.$router.push("/campaign");
+      } catch (error) {
+        console.log(error);
+      }
+    },
   },
 };
 </script>

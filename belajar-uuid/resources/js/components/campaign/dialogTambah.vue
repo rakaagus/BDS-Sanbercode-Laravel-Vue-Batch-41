@@ -77,6 +77,7 @@
 
 <script>
 export default {
+  emits: ["getDataCampaign"],
   data() {
     return {
       dialog: false,
@@ -107,6 +108,18 @@ export default {
         this.alert.show_alert = true;
         this.alert.alert_variant = "warning";
         this.alert.alert_msg = "please waits";
+
+        try {
+          const getData = await axios.post("/api/campaign", this.campaign);
+          this.alert.show_alert = true;
+          this.alert.alert_variant = "success";
+          this.alert.alert_msg = getData.data.response_message;
+
+          this.dialog = false;
+          this.$router.push("/campaign");
+        } catch (error) {
+          console.log(error);
+        }
       }
     },
   },

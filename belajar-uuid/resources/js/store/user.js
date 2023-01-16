@@ -49,7 +49,7 @@ export const useUserStore = defineStore('user', {
         },
         async removeAuth(){
             this.token = "";
-            this.user =  null;
+            this.user = null;
             this.isLogin =  false;
             this.isAdmin = false;
             this.isNotVerification = false;

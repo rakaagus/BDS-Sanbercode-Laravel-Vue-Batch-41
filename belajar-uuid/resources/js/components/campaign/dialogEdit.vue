@@ -65,7 +65,7 @@
 
             <v-file-input chips label="Image"></v-file-input>
 
-            <v-btn color="warning" @click="submitDataCampaign">
+            <v-btn color="warning" @click="sumbitUpdate">
               Reset Validation
             </v-btn>
           </v-form>
@@ -98,6 +98,48 @@ export default {
       descriptionRules: [(v) => !!v || "description is required"],
       addressRules: [(v) => !!v || "address is required"],
     };
+  },
+  props: ["campaignId"],
+  methods: {
+    async getDetailData() {
+      try {
+        const getData = await axios.get(`/api/campaign/${this.campaignId}`);
+        const data = getData.data.data;
+        this.campaign.title = data.title;
+        this.campaign.description = data.description;
+        this.campaign.address = data.address;
+        this.campaign.required = data.required;
+        this.campaign.collected = data.collected;
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async sumbitUpdate() {
+      const { valid } = await this.$refs.form.validate();
+
+      if (valid) {
+        this.alert.show_alert = true;
+        this.alert.alert_variant = "warning";
+        this.alert.alert_msg = "please waits";
+
+        try {
+          const getData = await axios.post("/api/campaign", this.campaign, {
+            _method: "PUT",
+          });
+          this.alert.show_alert = true;
+          this.alert.alert_variant = "success";
+          this.alert.alert_msg = getData.data.response_message;
+
+          this.dialog = false;
+          this.$router.push("/campaign");
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    },
+  },
+  created() {
+    this.getDetailData();
   },
 };
 </script>
