@@ -11,6 +11,7 @@ use Illuminate\Support\Str;
 use Carbon\Carbon;
 use App\Events\UserRegisterEvent;
 use App\Events\GenerateOtpUser;
+use Illuminate\Support\Facades\Auth as AuthUser;
 
 class AuthController extends Controller
 {
@@ -31,12 +32,15 @@ class AuthController extends Controller
 
         $data['user'] = $user;
 
+        $token = AuthUser::login($user);
+
         event(new UserRegisterEvent($user));
 
         return response()->json([
             "response_code" => "201",
             "response_message" => "user berhasil di register",
-            'data' => $data
+            'data' => $data,
+            'token' => $token
         ], 201);
     }
 
@@ -148,8 +152,8 @@ class AuthController extends Controller
         event(new GenerateOtpUser($user));
 
         return response()->json([
-            "success" => true,
-            "message" =>  "OTP Code Berhasil di generate",
+            "response_code" => "200",
+            "response_message" =>  "OTP Code Berhasil di generate",
             "data" => $data,
         ], 200);
     }

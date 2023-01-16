@@ -29,7 +29,7 @@ Route::prefix('auth')->group(function () {
     Route::post('/update-password', [AuthController::class, 'updatePassword'])->middleware('auth', 'email_verified');
 });
 
-Route::get('/get-profile', [AuthController::class, 'profile'])->middleware('auth', 'email_verified');
+Route::get('/get-profile', [AuthController::class, 'profile'])->middleware('auth');
 Route::post('/update-profile', [AuthController::class, 'updateProfile'])->middleware('auth', 'email_verified');
 
 Route::apiResource('campaign', CampaignController::class);

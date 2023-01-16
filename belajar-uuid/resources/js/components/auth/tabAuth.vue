@@ -18,7 +18,7 @@
         <v-window-item value="register">
           <v-card color="white" flat>
             <v-card-text>
-              <register-form />
+              <register-form @closeDialog="closeDialog" />
             </v-card-text>
           </v-card>
         </v-window-item>

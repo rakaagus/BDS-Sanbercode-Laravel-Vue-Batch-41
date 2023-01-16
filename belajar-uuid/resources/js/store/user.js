@@ -10,6 +10,7 @@ export const useUserStore = defineStore('user', {
         user: null,
         isLogin: false,
         isAdmin: false,
+        isNotVerification: null,
       }
     },
     actions: {
@@ -35,16 +36,32 @@ export const useUserStore = defineStore('user', {
                     this.isAdmin = null
                 }
 
+                if(userRole.email_verified_at != null){
+                    this.isNotVerification = false
+                }else{
+                    this.isNotVerification = true
+                }
+
                 this.isLogin = true
             } catch (error) {
                 console.log(error)
             }
         },
         async removeAuth(){
-            this.token =  "";
+            this.token = "";
             this.user =  null;
             this.isLogin =  false;
             this.isAdmin = false;
+            this.isNotVerification = false;
+        },
+        async setVerification(user, token){
+            this.token =  token;
+            this.user =  user;
+            this.isLogin =  true;
+            this.isNotVerification = true;
+        },
+        async verificationSuccess(){
+            this.isNotVerification = null;
         }
     },
     persist: true

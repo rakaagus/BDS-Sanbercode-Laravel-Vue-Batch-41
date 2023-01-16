@@ -41,12 +41,22 @@
         <v-list-item
           prepend-icon="mdi-view-dashboard"
           title="Home"
+          :to="{ name: 'home' }"
           value="home"
         ></v-list-item>
         <v-list-item
+          v-if="userStore.isAdmin"
           prepend-icon="mdi-forum"
-          title="About"
-          value="about"
+          :to="{ name: 'campaign' }"
+          title="Campaign"
+          value="Campaign"
+        ></v-list-item>
+        <v-list-item
+          v-if="userStore.isNotVerification"
+          prepend-icon="mdi-account-alert"
+          :to="{ name: 'verification' }"
+          title="Verifikasi Account"
+          value="verifikasi"
         ></v-list-item>
       </v-list>
 
