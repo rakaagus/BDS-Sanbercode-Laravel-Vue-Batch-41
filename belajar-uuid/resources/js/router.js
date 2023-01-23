@@ -5,6 +5,7 @@ const Home = () => import('@/views/Home.vue')
 const About = () => import('@/views/About.vue')
 const Campaign = () => import('@/views/Campaign.vue')
 const Verification = () => import('@/views/Verification.vue')
+const CampaignDetail = () => import('@/views/CampaignDetail.vue');
 
 const router = createRouter({
     // 4. Provide the history implementation to use. We are using the hash history for simplicity here.
@@ -22,6 +23,11 @@ const router = createRouter({
             meta: {
                 requiredAdmin: true
             }
+        },
+        {
+            path: '/campaign/:id',
+            name: 'campaign-detail',
+            component: CampaignDetail,
         },
         {
             path: '/verification',

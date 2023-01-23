@@ -164,7 +164,6 @@ class AuthController extends Controller
         ]);
 
         $otp_code = OtpCode::where('otp', $request->otp)->first();
-
         if(!$otp_code){
             return response()->json([
                 "response_code" => "01",

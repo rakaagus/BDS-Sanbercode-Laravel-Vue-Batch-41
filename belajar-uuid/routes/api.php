@@ -32,4 +32,11 @@ Route::prefix('auth')->group(function () {
 Route::get('/get-profile', [AuthController::class, 'profile'])->middleware('auth');
 Route::post('/update-profile', [AuthController::class, 'updateProfile'])->middleware('auth', 'email_verified');
 
-Route::apiResource('campaign', CampaignController::class);
+Route::group([
+    'middleware' => ['api']
+],
+function($router){
+    Route::apiResource('campaign', CampaignController::class);
+});
+
+Route::get('/gatallcampaign', [CampaignController::class, 'getAll']);

@@ -15,8 +15,9 @@ export default {
     async getDataCampaign() {
       try {
         const getData = await axios.get("/api/campaign");
-        const data = getData.data.data.campaign;
-        return data;
+        console.log(getData);
+        // const data = getData.data.data.campaign;
+        // return data;
       } catch (error) {
         console.log(error);
       }

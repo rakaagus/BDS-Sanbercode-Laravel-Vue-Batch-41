@@ -13,6 +13,10 @@ class CampaignController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function __construct(){
+        $this->middleware(['isAdmin', 'auth'])->except(['show', 'getAll']);
+    }
+
     public function index()
     {
         //
@@ -196,6 +200,18 @@ class CampaignController extends Controller
         return response()->json([
             "response_code" => "00",
             "response_message" => "berhasil Menghapus Campaig",
+        ], 200);
+    }
+
+    public function getAll(){
+        $campaign = Campaign::paginate(2);
+
+        $data['campaign'] = $campaign;
+
+        return response()->json([
+            "response_code" => "00",
+            "response_message" => "Data Campaign pagination Berhasil Ditampilkan",
+            "data" => $data
         ], 200);
     }
 }
